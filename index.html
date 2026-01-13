@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Хлорсутек қышқылының қасиеттері - Анимациялық сабақ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            overflow-x: hidden;
+        }
+
+        /* Ыдыстарды (сынауықтарды) үлкейту */
+        .test-tube {
+            width: 80px; /* 40px-ден 80px-ге дейін үлкейтілді */
+            height: 250px; /* 150px-ден 250px-ге дейін үлкейтілді */
+            border: 4px solid #cbd5e1;
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .liquid {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 0%;
+            transition: height 1s ease, background-color 0.8s ease;
+        }
+
+        .hcl-liquid {
+            background-color: rgba(200, 230, 255, 0.6);
+            height: 60%;
+        }
+
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            animation: rise 2s infinite ease-in;
+            opacity: 0;
+        }
+
+        @keyframes rise {
+            0% { bottom: 10%; opacity: 0; transform: translateX(0); }
+            50% { opacity: 1; }
+            100% { bottom: 85%; opacity: 0; transform: translateX(15px); }
+        }
+
+        .fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div id="app" class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col h-[700px] relative">
+        
+        <!-- Header -->
+        <div class="bg-blue-600 text-white p-6 text-center shadow-md">
+            <h1 id="scene-title" class="text-2xl font-bold">1-көрініс. Кіріспе</h1>
+        </div>
+
+        <!-- Content Area -->
+        <div id="content-area" class="flex-grow p-8 flex flex-col items-center justify-center text-center relative">
+            <!-- Content will be injected here -->
+        </div>
+
+        <!-- Controls -->
+        <div class="bg-gray-50 p-6 flex justify-between items-center border-t border-gray-200">
+            <button id="prev-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-8 py-3 rounded-full font-bold transition disabled:opacity-50">Алдыңғы</button>
+            <div id="step-indicator" class="text-lg font-semibold text-gray-500">Бет 1 / 7</div>
+            <button id="next-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-bold transition">Келесі</button>
+        </div>
+    </div>
+
+    <script>
+        const scenes = [
+            {
+                title: "1-көрініс. Кіріспе",
+                content: `
+                    <div class="fade-in space-y-6">
+                        <h2 class="text-4xl font-extrabold text-blue-900 mb-4">Хлорсутек қышқылы ерітіндісінің қасиеттерін зерттеу</h2>
+                        <div class="bg-blue-50 p-8 rounded-2xl border-l-8 border-blue-500 max-w-xl mx-auto">
+                            <p class="text-xl text-blue-800 italic font-medium">«Қышқылдар – күрделі заттар. Бүгін біз тұз қышқылының негізгі қасиеттерін тәжірибе арқылы бақылаймыз».</p>
+                        </div>
+                        <div class="mt-8 flex justify-center">
+                            <span class="text-8xl animate-bounce">🧪</span>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "2-көрініс. Реактивтер мен құралдар",
+                content: `
+                    <div class="grid grid-cols-2 gap-6 w-full max-w-2xl">
+                        <div class="bg-white p-5 border-2 border-blue-100 rounded-xl shadow-sm fade-in text-lg font-semibold" style="animation-delay: 0.1s">⚗️ Тұз қышқылы (HCl)</div>
+                        <div class="bg-white p-5 border-2 border-blue-100 rounded-xl shadow-sm fade-in text-lg font-semibold" style="animation-delay: 0.3s">🟦 Лакмус қағазы</div>
+                        <div class="bg-white p-5 border-2 border-blue-100 rounded-xl shadow-sm fade-in text-lg font-semibold" style="animation-delay: 0.5s">🧪 Калий гидроксиді (KOH)</div>
+                        <div class="bg-white p-5 border-2 border-blue-100 rounded-xl shadow-sm fade-in text-lg font-semibold" style="animation-delay: 0.7s">⚙️ Мырыш түйіршігі (Zn)</div>
+                        <div class="bg-white p-5 border-2 border-blue-100 rounded-xl shadow-sm fade-in text-lg font-semibold" style="animation-delay: 0.9s">⚪ Магний оксиді (MgO)</div>
+                        <div class="bg-white p-5 border-2 border-blue-100 rounded-xl shadow-sm fade-in text-lg font-semibold" style="animation-delay: 1.1s">🧪 Үш сынауық, штатив</div>
+                    </div>
+                `
+            },
+            {
+                title: "3-көрініс. Қауіпсіздік ережелері",
+                content: `
+                    <div class="fade-in flex flex-col items-center">
+                        <div class="relative mb-6">
+                            <span class="text-9xl">👨‍🔬</span>
+                            <div class="absolute top-0 right-0 bg-yellow-400 text-white p-4 rounded-full shadow-lg pulse text-2xl">⚠️</div>
+                        </div>
+                        <div class="bg-red-50 p-8 rounded-3xl border-4 border-red-200 shadow-xl">
+                            <p class="text-3xl font-black text-red-600 mb-4">Қауіпсіздік ережесі!</p>
+                            <ul class="text-left space-y-3 text-xl font-medium text-gray-800">
+                                <li>🥽 Қорғаныш көзілдірігін киіңіз</li>
+                                <li>🧤 Арнайы қолғапты пайдаланыңыз</li>
+                                <li>🥼 Халатты түймелеңіз</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "4-көрініс. 1-тәжірибе – Индикатор",
+                content: `
+                    <div class="flex flex-col items-center">
+                        <div class="flex gap-20 items-end mb-12">
+                            <div class="text-center">
+                                <p class="mb-4 text-lg font-bold text-gray-600">Сынауық #1</p>
+                                <div class="test-tube mx-auto">
+                                    <div id="liquid-1" class="liquid hcl-liquid"></div>
+                                </div>
+                            </div>
+                            <button id="indicator-tool" class="bg-blue-500 text-white px-8 py-4 rounded-2xl shadow-xl hover:bg-blue-600 hover:scale-110 transition-all font-bold text-xl">Лакмусты тамызу 💧</button>
+                        </div>
+                        <div id="exp-result" class="hidden fade-in bg-pink-100 border-2 border-pink-300 p-6 rounded-2xl text-pink-800 text-xl font-black shadow-lg">
+                            Қышқыл көк лакмусты қызыл түске өзгертеді.
+                        </div>
+                    </div>
+                `,
+                action: () => {
+                    const btn = document.getElementById('indicator-tool');
+                    const liquid = document.getElementById('liquid-1');
+                    const result = document.getElementById('exp-result');
+                    btn.addEventListener('click', () => {
+                        liquid.style.backgroundColor = 'rgba(239, 68, 68, 0.8)';
+                        result.classList.remove('hidden');
+                        btn.style.display = 'none';
+                    });
+                }
+            },
+            {
+                title: "5-көрініс. 2-тәжірибе – Металмен әрекеттесу",
+                content: `
+                    <div class="flex flex-col items-center">
+                        <div class="flex gap-20 items-end mb-12">
+                            <div class="text-center relative">
+                                <p class="mb-4 text-lg font-bold text-gray-600">Сынауық #2 (HCl)</p>
+                                <div class="test-tube mx-auto" id="tube-2">
+                                    <div class="liquid hcl-liquid"></div>
+                                    <div id="bubbles-container"></div>
+                                </div>
+                                <div id="zinc-pellet" class="absolute bottom-2 left-1/2 -translate-x-1/2 w-8 h-8 bg-gray-500 rounded-md hidden shadow-inner border border-gray-600"></div>
+                            </div>
+                            <button id="add-zinc" class="bg-gray-700 text-white px-8 py-4 rounded-2xl shadow-xl hover:bg-black transition-all font-bold text-xl">Zn (Мырыш) қосу ⚙️</button>
+                        </div>
+                        <div id="exp-result-2" class="hidden fade-in space-y-4">
+                            <p class="text-blue-800 font-bold text-xl italic">«Қышқылдар белсенді металдармен әрекеттесіп, сутек газын бөледі».</p>
+                            <div class="bg-gray-900 text-white p-6 rounded-xl font-mono text-3xl shadow-2xl border-4 border-blue-400">
+                                Zn + 2HCl → ZnCl₂ + H₂↑
+                            </div>
+                        </div>
+                    </div>
+                `,
+                action: () => {
+                    const btn = document.getElementById('add-zinc');
+                    const pellet = document.getElementById('zinc-pellet');
+                    const container = document.getElementById('bubbles-container');
+                    const result = document.getElementById('exp-result-2');
+                    
+                    btn.addEventListener('click', () => {
+                        pellet.classList.remove('hidden');
+                        btn.style.display = 'none';
+                        result.classList.remove('hidden');
+                        
+                        // Көпіршіктерді көбірек және үлкенірек жасау
+                        for(let i=0; i<35; i++) {
+                            setTimeout(() => {
+                                const b = document.createElement('div');
+                                b.className = 'bubble';
+                                b.style.left = Math.random() * 80 + 10 + '%';
+                                b.style.width = b.style.height = Math.random() * 10 + 6 + 'px';
+                                container.appendChild(b);
+                            }, i * 150);
+                        }
+                    });
+                }
+            },
+            {
+                title: "6-көрініс. 3-тәжірибе – Негіздік оксид",
+                content: `
+                    <div class="flex flex-col items-center">
+                        <div class="flex gap-20 items-end mb-12">
+                            <div class="text-center">
+                                <p class="mb-4 text-lg font-bold text-gray-600">Сынауық #3 (HCl + MgO)</p>
+                                <div class="test-tube mx-auto">
+                                    <div id="liquid-3" class="liquid" style="background-color: rgba(200, 230, 255, 0.6); height: 60%"></div>
+                                    <div id="oxide-powder" class="absolute bottom-0 w-full h-12 bg-white opacity-90 transition-all duration-2000 shadow-inner"></div>
+                                </div>
+                            </div>
+                            <button id="dissolve-btn" class="bg-orange-500 text-white px-8 py-4 rounded-2xl shadow-xl hover:bg-orange-600 font-bold text-xl">MgO еріту ⚪</button>
+                        </div>
+                        <div id="exp-result-3" class="hidden fade-in space-y-4">
+                            <p class="text-blue-800 font-bold text-xl">Ерітінді мөлдірленеді (тұз түзілгенінің белгісі).</p>
+                            <div class="bg-gray-900 text-white p-6 rounded-xl font-mono text-3xl shadow-2xl border-4 border-orange-400">
+                                MgO + 2HCl → MgCl₂ + H₂O
+                            </div>
+                        </div>
+                    </div>
+                `,
+                action: () => {
+                    const btn = document.getElementById('dissolve-btn');
+                    const powder = document.getElementById('oxide-powder');
+                    const result = document.getElementById('exp-result-3');
+                    const liquid = document.getElementById('liquid-3');
+                    
+                    btn.addEventListener('click', () => {
+                        powder.style.height = '0px';
+                        powder.style.opacity = '0';
+                        liquid.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
+                        result.classList.remove('hidden');
+                        btn.style.display = 'none';
+                    });
+                }
+            },
+            {
+                title: "7-көрініс. Қорытынды",
+                content: `
+                    <div class="fade-in w-full max-w-2xl mx-auto">
+                        <h3 class="text-3xl font-black mb-8 text-blue-900 border-b-4 border-blue-100 pb-2">Сабақ қорытындысы</h3>
+                        <div class="space-y-6">
+                            <div class="flex items-center gap-6 bg-white p-6 rounded-2xl border-l-8 border-red-500 shadow-lg">
+                                <span class="text-4xl">🔴</span>
+                                <p class="text-xl font-bold">Индикатор: Лакмус қызыл түске өзгереді</p>
+                            </div>
+                            <div class="flex items-center gap-6 bg-white p-6 rounded-2xl border-l-8 border-gray-500 shadow-lg">
+                                <span class="text-4xl">🫧</span>
+                                <p class="text-xl font-bold">Металдар: Сутек газы бөлінеді (H₂↑)</p>
+                            </div>
+                            <div class="flex items-center gap-6 bg-white p-6 rounded-2xl border-l-8 border-blue-500 shadow-lg">
+                                <span class="text-4xl">🧪</span>
+                                <p class="text-xl font-bold">Оксидтер: Тұз бен су түзіледі</p>
+                            </div>
+                        </div>
+                        <div class="mt-12 bg-blue-600 text-white p-6 rounded-3xl shadow-2xl">
+                            <p class="text-2xl font-black text-center">
+                                Тұз қышқылы — күшті электролит және типтік қышқыл!
+                            </p>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        let currentScene = 0;
+
+        const titleEl = document.getElementById('scene-title');
+        const contentEl = document.getElementById('content-area');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const stepIndicator = document.getElementById('step-indicator');
+
+        function updateScene() {
+            const scene = scenes[currentScene];
+            titleEl.textContent = scene.title;
+            contentEl.innerHTML = scene.content;
+            stepIndicator.textContent = `Бет ${currentScene + 1} / ${scenes.length}`;
+            
+            if (scene.action) {
+                scene.action();
+            }
+
+            prevBtn.disabled = currentScene === 0;
+            if (currentScene === scenes.length - 1) {
+                nextBtn.textContent = "Қайталау 🔄";
+            } else {
+                nextBtn.textContent = "Келесі ➡️";
+            }
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentScene < scenes.length - 1) {
+                currentScene++;
+            } else {
+                currentScene = 0;
+            }
+            updateScene();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentScene > 0) {
+                currentScene--;
+                updateScene();
+            }
+        });
+
+        // Іске қосу
+        updateScene();
+    </script>
+</body>
+</html>
